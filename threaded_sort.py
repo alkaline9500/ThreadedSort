@@ -5,8 +5,6 @@ Threaded Sort
 __author__ = "Nic Manoogian"
 
 from multiprocessing import Pool, cpu_count
-from random import randint
-from time import time
 
 def merge(lists):
     """
@@ -39,10 +37,21 @@ def threaded_sort(elements):
     if len(elements) <= group_count*5:
         return sorted(elements)
     groups = [elements[i:i+group_count] for i in range(0, len(elements), group_count)]
-    return merge(Pool().map(sorted, groups))
+    final = []
+    sorted_groups = Pool().map(sorted, groups)
+    for g in groups:
+        final += g
+    return sorted(final)
 
 if __name__ == "__main__":
-    elements = [randint(0, 100000) for _ in range(10000)]
+    from random import randint
+    from time import time
+    import argparse
+    parser = argparse.ArgumentParser(description='Threaded Sorting Test')
+    parser.add_argument('-n', metavar="n", type=int, help='how many random numbers to generate', default=10000)
+    args = parser.parse_args()
+
+    elements = [randint(0, 100000) for _ in range(args.n)]
     print("Non-threaded")
     start = time()
     regular = sorted(elements)
